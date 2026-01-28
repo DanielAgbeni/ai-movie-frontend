@@ -128,7 +128,7 @@ export default function ChannelPage() {
 			{/* Channel Banner */}
 			<div className="relative h-48 w-full overflow-hidden bg-linear-to-r from-primary/20 via-secondary to-primary/20 md:h-64">
 				<img
-					src={creator.bannerUrl || '/channel-banner.jpg'} // Use default if no banner
+					src={creator?.bannerUrl || '/channel-banner.jpg'} // Use default if no banner
 					alt="Channel banner"
 					className="h-full w-full object-cover"
 				/>
@@ -141,11 +141,11 @@ export default function ChannelPage() {
 						{/* Avatar */}
 						<Avatar className="h-32 w-32 border-4 border-background">
 							<AvatarImage
-								src={creator.avatarUrl || '/diverse-avatars.png'}
-								alt={creator.displayName}
+								src={creator?.avatarUrl || '/diverse-avatars.png'}
+								alt={creator?.displayName}
 							/>
 							<AvatarFallback className="text-2xl">
-								{creator.displayName.charAt(0)}
+								{creator?.displayName?.charAt(0)}
 							</AvatarFallback>
 						</Avatar>
 
@@ -155,23 +155,23 @@ export default function ChannelPage() {
 								<div>
 									<div className="flex items-center gap-2">
 										<h1 className="text-2xl font-bold md:text-3xl">
-											{creator.displayName}
+											{creator?.displayName}
 										</h1>
-										{creator.isVerified && (
+										{creator?.isVerified && (
 											<Badge className="bg-primary text-primary-foreground">
 												Verified
 											</Badge>
 										)}
 									</div>
 									<p className="text-sm text-muted-foreground">
-										@{creator.displayName.toLowerCase().replace(/\s+/g, '')}
+										@{creator?.displayName?.toLowerCase().replace(/\s+/g, '')}
 									</p>
 									<div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-										<span>{creator.stats.subscribersCount} subscribers</span>
+										<span>{creator?.stats?.subscribersCount} subscribers</span>
 										<span>•</span>
-										<span>{creator.stats.totalVideos} videos</span>
+										<span>{creator?.stats?.totalVideos} videos</span>
 										<span>•</span>
-										<span>{creator.stats.totalViews} views</span>
+										<span>{creator?.stats?.totalViews} views</span>
 									</div>
 								</div>
 
@@ -258,19 +258,19 @@ export default function ChannelPage() {
 								<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 									{videos.map((video) => (
 										<VideoCard
-											key={video._id}
-											id={video._id}
-											title={video.title}
-											thumbnail={video.thumbnail.url}
+											key={video?._id}
+											id={video?._id}
+											title={video?.title}
+											thumbnail={video?.thumbnail?.url}
 											creator={{
-												name: creator.displayName,
-												avatar: creator.avatarUrl || '/diverse-avatars.png',
+												name: creator?.displayName,
+												avatar: creator?.avatarUrl || '/diverse-avatars.png',
 											}}
-											views={`${video.stats.viewsCount} views`}
+											views={`${video?.stats?.viewsCount} views`}
 											uploadDate={new Date(
-												video.createdAt,
+												video?.createdAt,
 											).toLocaleDateString()}
-											duration={formatDuration(video.durationSec)}
+											duration={formatDuration(video?.durationSec)}
 										/>
 									))}
 								</div>
@@ -286,7 +286,7 @@ export default function ChannelPage() {
 							<div>
 								<h2 className="mb-3 text-xl font-bold">Description</h2>
 								<p className="leading-relaxed text-muted-foreground">
-									{creator.bio || 'No description available.'}
+									{creator?.bio || 'No description available.'}
 								</p>
 							</div>
 
@@ -297,19 +297,19 @@ export default function ChannelPage() {
 										<div className="flex justify-between">
 											<span className="text-muted-foreground">Joined</span>
 											<span className="font-medium">
-												{new Date(creator.createdAt).toLocaleDateString()}
+												{new Date(creator?.createdAt).toLocaleDateString()}
 											</span>
 										</div>
 										<div className="flex justify-between">
 											<span className="text-muted-foreground">Total Views</span>
 											<span className="font-medium">
-												{creator.stats.totalViews}
+												{creator?.stats?.totalViews}
 											</span>
 										</div>
 										<div className="flex justify-between">
 											<span className="text-muted-foreground">Subscribers</span>
 											<span className="font-medium">
-												{creator.stats.subscribersCount}
+												{creator?.stats?.subscribersCount}
 											</span>
 										</div>
 									</div>
@@ -319,16 +319,16 @@ export default function ChannelPage() {
 									<h3 className="mb-3 font-semibold">Links</h3>
 									<div className="space-y-2">
 										{/* Placeholder links as socialLinks object structure wasn't fully defined in response example but is in type */}
-										{creator.socialLinks?.website && (
+										{creator?.socialLinks?.website && (
 											<a
-												href={creator.socialLinks.website}
+												href={creator?.socialLinks?.website}
 												className="flex items-center gap-2 text-primary hover:underline">
 												Website
 											</a>
 										)}
-										{creator.socialLinks?.twitter && (
+										{creator?.socialLinks?.twitter && (
 											<a
-												href={creator.socialLinks.twitter}
+												href={creator?.socialLinks?.twitter}
 												className="flex items-center gap-2 text-primary hover:underline">
 												Twitter
 											</a>

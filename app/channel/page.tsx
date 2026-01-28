@@ -8,8 +8,6 @@ import { Badge } from '@/components/ui/badge';
 import { Bell, Play, BellOff } from 'lucide-react';
 import Link from 'next/link';
 import { getSubscriptions, unsubscribeFromCreator } from '@/api/engagement';
-import { Subscription } from '@/api/types';
-
 export default function ChannelListPage() {
 	const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -37,7 +35,7 @@ export default function ChannelListPage() {
 			await unsubscribeFromCreator(creatorId);
 			// Remove from list after successful unsubscribe
 			setSubscriptions((prev) =>
-				prev.filter((sub) => sub.creatorId._id !== creatorId),
+				prev.filter((sub) => sub?.creatorId?._id !== creatorId),
 			);
 		} catch (error) {
 			console.error('Failed to unsubscribe', error);
@@ -49,7 +47,7 @@ export default function ChannelListPage() {
 			<Header />
 
 			{/* Hero Section */}
-			<div className="border-b border-border bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10">
+			<div className="border-b border-border bg-linear-to-r from-primary/10 via-secondary/10 to-primary/10">
 				<div className="container mx-auto px-4 py-12">
 					<h1 className="text-balance text-4xl font-bold">
 						Your Subscriptions
@@ -77,47 +75,49 @@ export default function ChannelListPage() {
 						{subscriptions.map((sub) => (
 							<Link
 								key={sub._id}
-								href={`/channel/${sub.creatorId._id}`}>
+								href={`/channel/${sub?.creatorId?._id}`}>
 								<div className="group cursor-pointer rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/50 hover:shadow-lg">
 									{/* Avatar */}
 									<div className="mb-4 flex items-center gap-4">
 										<Avatar className="h-16 w-16">
 											<AvatarImage
-												src={sub.creatorId.avatarUrl}
-												alt={sub.creatorId.displayName}
+												src={sub?.creatorId?.avatarUrl}
+												alt={sub?.creatorId?.displayName}
 											/>
 											<AvatarFallback>
-												{sub.creatorId.displayName.charAt(0)}
+												{sub?.creatorId?.displayName?.charAt(0)}
 											</AvatarFallback>
 										</Avatar>
 										<div className="flex-1">
 											<div className="flex items-center gap-2">
 												<h3 className="font-bold group-hover:text-primary">
-													{sub.creatorId.displayName}
+													{sub?.creatorId?.displayName}
 												</h3>
-												{sub.creatorId.isVerified && (
+												{sub?.creatorId?.isVerified && (
 													<Badge className="bg-primary text-primary-foreground">
 														Verified
 													</Badge>
 												)}
 											</div>
 											<p className="text-sm text-muted-foreground line-clamp-1">
-												{sub.creatorId.bio || 'No bio'}
+												{sub?.creatorId?.bio || 'No bio'}
 											</p>
 										</div>
 									</div>
 
 									{/* Stats */}
 									<div className="mb-4 space-y-1 text-sm text-muted-foreground">
-										<p>{sub.creatorId.stats.subscribersCount} subscribers</p>
-										<p>{sub.creatorId.stats.totalVideos} videos</p>
+										<p>{sub?.creatorId?.stats?.subscribersCount} subscribers</p>
+										<p>{sub?.creatorId?.stats?.totalVideos} videos</p>
 									</div>
 
 									{/* Action Buttons */}
 									<div className="flex gap-2">
 										<Button
 											className="flex-1 bg-secondary text-secondary-foreground hover:bg-destructive hover:text-destructive-foreground transition-colors"
-											onClick={(e) => handleUnsubscribe(e, sub.creatorId._id)}>
+											onClick={(e) =>
+												handleUnsubscribe(e, sub?.creatorId?._id)
+											}>
 											<BellOff className="mr-2 h-4 w-4" />
 											Unsubscribe
 										</Button>

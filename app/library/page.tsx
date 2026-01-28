@@ -343,22 +343,23 @@ export default function LibraryPage() {
 											<div className="flex items-center gap-4">
 												<img
 													src={'/diverse-avatars.png'} // Fallback
-													alt={sub.creatorId.displayName}
+													alt={sub?.creatorId?.displayName}
 													className="h-12 w-12 rounded-full object-cover"
 												/>
 												<div>
 													<div className="flex items-center gap-2">
 														<h3 className="font-semibold">
-															{sub.creatorId.displayName}
+															{sub?.creatorId?.displayName}
 														</h3>
-														{sub.creatorId.isVerified && (
+														{sub?.creatorId?.isVerified && (
 															<Badge className="bg-primary text-primary-foreground text-xs">
 																Verified
 															</Badge>
 														)}
 													</div>
 													<p className="text-xs text-muted-foreground">
-														{sub.creatorId.stats.subscribersCount} subscribers
+														{sub?.creatorId?.stats?.subscribersCount}{' '}
+														subscribers
 													</p>
 												</div>
 											</div>

@@ -256,6 +256,7 @@ declare global {
 		stats: {
 			subscribersCount: number;
 			totalViews: number;
+			totalVideos: number;
 			totalEarningsCents: number;
 		};
 		isVerified: boolean;
@@ -393,6 +394,7 @@ declare global {
 			};
 			_id: string;
 			displayName: string;
+			avatarUrl: string;
 			bio: string;
 			isVerified: boolean;
 			createdAt: string;
