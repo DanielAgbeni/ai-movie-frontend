@@ -1,69 +1,83 @@
+'use client';
+
 import { Header } from '@/components/header';
+import { VideoCard } from '@/components/video-card';
+import { VideoCardSkeleton } from '@/components/skeletons/video-card-skeleton';
+import { useQuery } from '@tanstack/react-query';
+import { getBrowseMovies } from '@/api/movies';
+import { mapMovieToVideoCard } from '@/lib/movie-utils';
+import { ShoppingBag, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ShoppingBag, Rocket, Sparkles } from 'lucide-react';
 
 export default function MarketplacePage() {
+	const {
+		data: premiumMoviesResponse,
+		isLoading,
+		error,
+	} = useQuery({
+		queryKey: ['marketplace-premium'],
+		queryFn: () => getBrowseMovies({ type: 'premium' }),
+	});
+
+	const movies = premiumMoviesResponse?.data?.data || [];
+	const premiumVideos = movies.map(mapMovieToVideoCard);
+
 	return (
 		<div className="min-h-screen bg-background text-foreground flex flex-col">
 			<Header />
 
-			<main className="flex-1 flex flex-col items-center justify-center p-4 text-center relative overflow-hidden">
-				{/* Abstract Background Elements */}
-				<div className="absolute top-1/4 left-1/4 h-64 w-64 rounded-full bg-primary/20 blur-[100px]" />
-				<div className="absolute bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-blue-500/20 blur-[100px]" />
-
-				<div className="relative z-10 max-w-2xl mx-auto space-y-8 p-8 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm">
-					<div className="flex justify-center">
-						<div className="relative">
-							<div className="absolute -inset-1 rounded-full bg-linear-to-r from-primary to-purple-600 blur opacity-75 animate-pulse" />
-							<div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-card border border-border">
-								<ShoppingBag className="h-10 w-10 text-primary" />
-							</div>
-							<div className="absolute -bottom-2 -right-2 bg-background rounded-full p-1.5 border border-border">
-								<Sparkles className="h-4 w-4 text-yellow-500" />
-							</div>
-						</div>
-					</div>
-
-					<div className="space-y-4">
-						<h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-linear-to-r from-white to-white/60 bg-clip-text text-transparent">
-							Marketplace Coming Soon
+			<main className="flex-1 container mx-auto px-4 py-8">
+				{/* Header Section */}
+				<div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+					<div>
+						<h1 className="text-3xl font-bold flex items-center gap-2">
+							<ShoppingBag className="h-8 w-8 text-primary" />
+							Marketplace
 						</h1>
-						<p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-							We're building the ultimate destination for AI movie merchandise,
-							NFTs, and exclusive creator content. Get ready to own a piece of
-							the future.
+						<p className="text-muted-foreground mt-2">
+							Discover and own exclusive premium AI-generated movies. Support
+							creators directly.
 						</p>
 					</div>
-
-					<div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto pt-4">
-						<Input
-							type="email"
-							placeholder="Enter your email for updates"
-							className="bg-background/50 border-white/10 h-10"
-						/>
-						<Button className="h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-8 transition-all hover:scale-105">
-							<Rocket className="mr-2 h-4 w-4" />
-							Notify Me
-						</Button>
-					</div>
-
-					<div className="pt-8 grid grid-cols-3 gap-4 text-sm text-muted-foreground border-t border-white/5">
-						<div className="flex flex-col items-center gap-1">
-							<span className="font-semibold text-foreground">Exclusive</span>
-							<span>Merchandise</span>
-						</div>
-						<div className="flex flex-col items-center gap-1">
-							<span className="font-semibold text-foreground">Digital</span>
-							<span>Collectibles</span>
-						</div>
-						<div className="flex flex-col items-center gap-1">
-							<span className="font-semibold text-foreground">Direct</span>
-							<span>Support</span>
-						</div>
-					</div>
 				</div>
+
+				{/* Content Section */}
+				{isLoading ? (
+					<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+						{Array.from({ length: 8 }).map((_, i) => (
+							<VideoCardSkeleton key={`skeleton-${i}`} />
+						))}
+					</div>
+				) : error ? (
+					<div className="flex flex-col items-center justify-center py-20 text-center">
+						<AlertCircle className="h-12 w-12 text-destructive mb-4" />
+						<h3 className="text-xl font-semibold mb-2">Something went wrong</h3>
+						<p className="text-muted-foreground mb-4">
+							Failed to load the marketplace. Please try again later.
+						</p>
+						<Button onClick={() => window.location.reload()}>Try Again</Button>
+					</div>
+				) : premiumVideos.length === 0 ? (
+					<div className="flex flex-col items-center justify-center py-20 text-center border rounded-lg bg-card/50">
+						<ShoppingBag className="h-16 w-16 text-muted-foreground/30 mb-4" />
+						<h3 className="text-xl font-semibold mb-2">
+							No Premium Movies Yet
+						</h3>
+						<p className="text-muted-foreground max-w-md mx-auto">
+							Check back soon for exclusive premium content appearing in the
+							marketplace.
+						</p>
+					</div>
+				) : (
+					<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+						{premiumVideos.map((video) => (
+							<VideoCard
+								key={video.id}
+								{...video}
+							/>
+						))}
+					</div>
+				)}
 			</main>
 		</div>
 	);

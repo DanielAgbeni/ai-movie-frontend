@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import { useState, useEffect } from 'react';
 import {
 	getWatchHistory,
@@ -23,6 +25,7 @@ import {
 	MoreVertical,
 	Grid,
 	List,
+	ShoppingBag,
 } from 'lucide-react';
 
 // Mock library data
@@ -103,11 +106,10 @@ export default function LibraryPage() {
 							Favorites
 						</TabsTrigger>
 						<TabsTrigger
-							value="playlists"
-							disabled
-							className="flex items-center gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none rounded-none px-4 py-2 text-muted-foreground transition-none opacity-50 cursor-not-allowed">
-							<ListPlus className="h-4 w-4" />
-							Playlists
+							value="purchased"
+							className="flex items-center gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none rounded-none px-4 py-2 text-muted-foreground transition-none">
+							<ShoppingBag className="h-4 w-4" />
+							Purchased Movies
 						</TabsTrigger>
 						<TabsTrigger
 							value="subscriptions"
@@ -290,25 +292,25 @@ export default function LibraryPage() {
 						)}
 					</TabsContent>
 
-					{/* Playlists Tab */}
+					{/* Purchased Movies Tab */}
 					<TabsContent
-						value="playlists"
+						value="purchased"
 						className="mt-0">
 						<div className="mb-6 flex items-center justify-between">
-							<h2 className="text-xl font-bold">Your Playlists</h2>
-							<Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-								<Plus className="mr-2 h-4 w-4" />
-								Create Playlist
+							<h2 className="text-xl font-bold">Your Purchased Movies</h2>
+							<Button
+								variant="outline"
+								size="sm"
+								asChild>
+								<Link href="/marketplace">Browse Marketplace</Link>
 							</Button>
 						</div>
-						<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-							<div className="flex flex-col items-center justify-center py-12 text-center">
-								<ListPlus className="mb-4 h-12 w-12 text-muted-foreground/50" />
-								<h3 className="text-lg font-semibold">Playlists coming soon</h3>
-								<p className="text-muted-foreground">
-									Create and manage your playlists here
-								</p>
-							</div>
+						<div className="flex flex-col items-center justify-center py-12 text-center">
+							<ShoppingBag className="mb-4 h-12 w-12 text-muted-foreground/50" />
+							<h3 className="text-lg font-semibold">No purchased movies yet</h3>
+							<p className="text-muted-foreground">
+								Movies you buy will appear here
+							</p>
 						</div>
 					</TabsContent>
 
