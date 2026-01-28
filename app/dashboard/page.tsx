@@ -27,7 +27,6 @@ import {
 	useIsAuthenticated,
 	useIsRefreshing,
 } from '@/store/useAuthStore';
-import { useToast } from '@/components/ui/use-toast';
 
 // Dummy stats - will be replaced with real data from API in the future
 const stats: DashboardStats = {
@@ -42,7 +41,6 @@ const stats: DashboardStats = {
 const transactions: Transaction[] = [];
 
 export default function DashboardPage() {
-	const { toast } = useToast();
 	const user = useUser();
 	const isAuthenticated = useIsAuthenticated();
 	const isRefreshing = useIsRefreshing();

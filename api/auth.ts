@@ -66,3 +66,30 @@ export const resendVerificationEmail = (email: string) => {
 export const getMe = () => {
 	return api.get<ApiResponse<{ user: User }>>('/api/v1/auth/me');
 };
+
+/**
+ * Request password reset (Forgot Password)
+ */
+export const forgotPassword = (email: string) => {
+	return api.post('/api/v1/auth/forgot-password', { email });
+};
+
+/**
+ * Verify OTP for password reset
+ */
+export const verifyOtp = (email: string, otp: string) => {
+	return api.post<ApiResponse<{ resetToken: string }>>(
+		'/api/v1/auth/verify-otp',
+		{
+			email,
+			otp,
+		},
+	);
+};
+
+/**
+ * Reset Password with token
+ */
+export const resetPassword = (data: ResetPasswordData) => {
+	return api.post('/api/v1/auth/reset-password', data);
+};

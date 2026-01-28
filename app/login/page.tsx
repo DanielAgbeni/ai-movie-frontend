@@ -1,59 +1,56 @@
 'use client';
 
-import type React from 'react';
-
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from '@/components/ui/form';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useLogin } from '@/hooks/useAuth';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
+
+const loginSchema = z.object({
+	email: z.string().email('Please enter a valid email address'),
+	password: z.string().min(1, 'Password is required'),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
 	const router = useRouter();
-	const { toast } = useToast();
 	const { mutate: login, isPending } = useLogin();
-
 	const [showPassword, setShowPassword] = useState(false);
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
+	const form = useForm<LoginFormValues>({
+		resolver: zodResolver(loginSchema),
+		defaultValues: {
+			email: '',
+			password: '',
+		},
+	});
 
-		if (!email || !password) {
-			toast({
-				title: 'Error',
-				description: 'Please fill in all fields',
-				variant: 'destructive',
-			});
-			return;
-		}
-
-		login(
-			{ email, password },
-			{
-				onSuccess: () => {
-					toast({
-						title: 'Success',
-						description: 'Logged in successfully',
-					});
-					router.push('/');
-				},
-				onError: (error: any) => {
-					toast({
-						title: 'Error',
-						description:
-							error.response?.data?.message || 'Something went wrong',
-						variant: 'destructive',
-					});
-				},
+	const onSubmit = (data: LoginFormValues) => {
+		login(data, {
+			onSuccess: () => {
+				toast.success('Logged in successfully');
+				router.push('/');
 			},
-		);
+			onError: (error: any) => {
+				toast.error(error.response?.data?.message || 'Something went wrong');
+			},
+		});
 	};
 
 	return (
@@ -80,74 +77,87 @@ export default function LoginPage() {
 				</div>
 
 				<div className="bg-card border border-border rounded-lg p-8">
-					<form
-						onSubmit={handleSubmit}
-						className="space-y-6">
-						<div className="space-y-2">
-							<Label htmlFor="email">Email</Label>
-							<Input
-								id="email"
-								type="email"
-								placeholder="your@email.com"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								required
-								className="bg-background"
-								disabled={isPending}
+					<Form {...form}>
+						<form
+							onSubmit={form.handleSubmit(onSubmit)}
+							className="space-y-6">
+							<FormField
+								control={form.control}
+								name="email"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Email</FormLabel>
+										<FormControl>
+											<Input
+												placeholder="your@email.com"
+												type="email"
+												disabled={isPending}
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
 							/>
-						</div>
 
-						<div className="space-y-2">
-							<div className="flex items-center justify-between">
-								<Label htmlFor="password">Password</Label>
-								<Link
-									href="/forgot-password"
-									className="text-sm text-primary hover:underline">
-									Forgot password?
-								</Link>
-							</div>
-							<div className="relative">
-								<Input
-									id="password"
-									type={showPassword ? 'text' : 'password'}
-									placeholder="Enter your password"
-									value={password}
-									onChange={(e) => setPassword(e.target.value)}
-									required
-									className="bg-background pr-10"
-									disabled={isPending}
-								/>
-								<button
-									type="button"
-									onClick={() => setShowPassword(!showPassword)}
-									className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-									disabled={isPending}>
-									{showPassword ? (
-										<EyeOff className="h-4 w-4" />
-									) : (
-										<Eye className="h-4 w-4" />
-									)}
-								</button>
-							</div>
-						</div>
+							<FormField
+								control={form.control}
+								name="password"
+								render={({ field }) => (
+									<FormItem>
+										<div className="flex items-center justify-between">
+											<FormLabel>Password</FormLabel>
+											<Link
+												href="/forgot-password"
+												className="text-sm text-primary hover:underline">
+												Forgot password?
+											</Link>
+										</div>
+										<FormControl>
+											<div className="relative">
+												<Input
+													type={showPassword ? 'text' : 'password'}
+													placeholder="Enter your password"
+													disabled={isPending}
+													className="pr-10"
+													{...field}
+												/>
+												<button
+													type="button"
+													onClick={() => setShowPassword(!showPassword)}
+													className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+													disabled={isPending}>
+													{showPassword ? (
+														<EyeOff className="h-4 w-4" />
+													) : (
+														<Eye className="h-4 w-4" />
+													)}
+												</button>
+											</div>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
-						<Button
-							type="submit"
-							className="w-full"
-							disabled={isPending}>
-							{isPending ? (
-								<>
-									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-									Signing In...
-								</>
-							) : (
-								'Sign In'
-							)}
-						</Button>
-					</form>
+							<Button
+								type="submit"
+								className="w-full"
+								disabled={isPending}>
+								{isPending ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										Signing In...
+									</>
+								) : (
+									'Sign In'
+								)}
+							</Button>
+						</form>
+					</Form>
 
 					<div className="mt-6">
-						<div className="relative">
+						{/* <div className="relative">
 							<div className="absolute inset-0 flex items-center">
 								<div className="w-full border-t border-border"></div>
 							</div>
@@ -197,7 +207,7 @@ export default function LoginPage() {
 								</svg>
 								GitHub
 							</Button>
-						</div>
+						</div> */}
 
 						<p className="mt-8 text-center text-sm text-muted-foreground">
 							Don't have an account?{' '}

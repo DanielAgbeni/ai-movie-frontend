@@ -9,7 +9,6 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import {
 	ThumbsUp,
-	ThumbsDown,
 	MessageCircle,
 	MoreVertical,
 	Trash2,
@@ -32,8 +31,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { CommentForm } from './comment-form';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useToast } from '@/components/ui/use-toast';
-import { cn } from '@/lib/utils'; // Assuming you have a cn utility
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface CommentItemProps {
 	comment: Comment;
@@ -42,20 +41,12 @@ interface CommentItemProps {
 
 export function CommentItem({ comment, isReply = false }: CommentItemProps) {
 	const { user } = useAuthStore();
-	const { toast } = useToast();
 	const queryClient = useQueryClient();
 	const [isReplying, setIsReplying] = useState(false);
 	const [showReplies, setShowReplies] = useState(false);
 
-	// Optimistic state for likes (simplistic)
 	const [likesCount, setLikesCount] = useState(comment.stats.likesCount);
-	// We don't check "isLiked" from API yet unless we augment the Comment type or fetch status.
-	// For now assuming we don't have "isLiked" on the comment object itself,
-	// but the backend might need to return it.
-	// The current API spec provided doesn't explicitly modify Comment to include "isLiked".
-	// But `getComments` usually populates `isLiked` if auth.
-	// Let's assume for now we don't know, or we track it locally after action.
-	const [isLikedLocal, setIsLikedLocal] = useState(false); // Can't know initial state without API support
+	const [isLikedLocal, setIsLikedLocal] = useState(false); // Can be enhanced with actual liked status from API
 
 	const { mutate: toggleLike } = useMutation({
 		mutationFn: async () => {
@@ -68,15 +59,12 @@ export function CommentItem({ comment, isReply = false }: CommentItemProps) {
 			}
 		},
 		onSuccess: () => {
-			// Toggle local state
 			setIsLikedLocal(!isLikedLocal);
 			setLikesCount((prev) => (isLikedLocal ? prev - 1 : prev + 1));
 		},
-		onError: () => {
-			toast({
-				title: 'Error',
-				description: 'Failed to update like',
-				variant: 'destructive',
+		onError: (error: any) => {
+			toast.error('Error', {
+				description: error.response?.data?.message || 'Failed to update like',
 			});
 		},
 	});
@@ -84,21 +72,18 @@ export function CommentItem({ comment, isReply = false }: CommentItemProps) {
 	const { mutate: removeComment, isPending: isDeleting } = useMutation({
 		mutationFn: () => deleteComment(comment._id),
 		onSuccess: () => {
-			toast({ title: 'Success', description: 'Comment deleted' });
+			toast.success('Success', { description: 'Comment deleted' });
 			queryClient.invalidateQueries({
 				queryKey: [isReply ? 'replies' : 'comments'],
 			});
 		},
-		onError: () => {
-			toast({
-				title: 'Error',
+		onError: (error: any) => {
+			toast.error('Error', {
 				description: 'Failed to delete comment',
-				variant: 'destructive',
 			});
 		},
 	});
 
-	// Fetch replies if showing
 	const {
 		data: repliesData,
 		fetchNextPage,
@@ -115,34 +100,25 @@ export function CommentItem({ comment, isReply = false }: CommentItemProps) {
 		enabled: showReplies,
 	});
 
-	// Flatten replies
-	// The response is array of comments. But with infinite query it's pages.
-	// Wait, getReplies returns ApiRequestResponseType<CommentListResponse> locally defined which is Comment[]?
-	// No, `sendPaginated` format implies structure { data: T[], meta: ... }
-	// My api/engagement.ts types need to align with AxiosResponse<ApiResponse<T>>
-	// getReplies returns ApiRequestResponseType<CommentListResponse>.
-
 	const replies = repliesData?.pages.flatMap((page) => page.data.data) || [];
 
 	const isOwner =
-		user?._id === comment.userId._id || user?.email === comment.userId.email; // userId might be populated object or id string?
-	// In `getComments` backend code: `.populate('userId', 'email')`.
-	// So userId is an object { _id, email }.
+		user?._id === comment.userId._id || user?.email === comment.userId.email;
+
+	const displayName = comment.userId.name || comment.userId.email.split('@')[0];
 
 	return (
 		<div className="flex gap-3">
 			<Avatar className={cn('h-10 w-10', isReply && 'h-8 w-8')}>
-				<AvatarFallback>
-					{comment.userId.email.charAt(0).toUpperCase()}
-				</AvatarFallback>
+				{comment.userId.avatarUrl && (
+					<AvatarImage src={comment.userId.avatarUrl} />
+				)}
+				<AvatarFallback>{displayName.charAt(0).toUpperCase()}</AvatarFallback>
 			</Avatar>
 			<div className="flex-1 space-y-2">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-2">
-						<span className="text-sm font-semibold">
-							{/* Display Name not in populated user, using email part */}
-							{comment.userId.email.split('@')[0]}
-						</span>
+						<span className="text-sm font-semibold">{displayName}</span>
 						<span className="text-xs text-muted-foreground">
 							{formatDistanceToNow(new Date(comment.createdAt), {
 								addSuffix: true,
@@ -210,7 +186,6 @@ export function CommentItem({ comment, isReply = false }: CommentItemProps) {
 					</div>
 				)}
 
-				{/* Show/Hide Replies Toggle */}
 				{comment.stats.repliesCount > 0 && !isReply && (
 					<Button
 						variant="link"
@@ -223,7 +198,6 @@ export function CommentItem({ comment, isReply = false }: CommentItemProps) {
 					</Button>
 				)}
 
-				{/* Replies List */}
 				{showReplies && (
 					<div className="mt-4 space-y-4 pl-4 border-l-2 border-border/50">
 						{isLoadingReplies && (

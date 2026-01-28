@@ -94,6 +94,12 @@ declare global {
 		secureUrl: string;
 	};
 
+	export type ResetPasswordData = {
+		token: string;
+		password: string;
+		confirmPassword?: string;
+	};
+
 	export type MuxPlayback = {
 		assetId?: string;
 		playbackId?: string;
@@ -184,7 +190,7 @@ declare global {
 
 	export type CreateMovieRequest = {
 		title: string;
-		description: string;
+		description?: string;
 		visibility?: 'public' | 'unlisted' | 'private';
 		type?: 'free' | 'premium';
 		categories?: string[];

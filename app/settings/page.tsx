@@ -35,10 +35,10 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
-import { useToast } from '@/components/ui/use-toast';
 
 import { getCreatorProfile, updateCreatorProfile } from '@/api/creator';
 import { getCloudinarySignature } from '@/api/upload';
+import { toast } from 'sonner';
 
 const profileSchema = z.object({
 	displayName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -63,7 +63,6 @@ const profileSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function SettingsPage() {
-	const { toast } = useToast();
 	const queryClient = useQueryClient();
 	const [avatar, setAvatar] = useState<string | null>(null);
 	const [banner, setBanner] = useState<string | null>(null);
@@ -127,17 +126,14 @@ export default function SettingsPage() {
 		) => updateCreatorProfile(data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['creatorProfile'] });
-			toast({
-				title: 'Profile Updated',
+			toast('Profile Updated', {
 				description: 'Your profile has been successfully updated.',
 			});
 		},
 		onError: (error: any) => {
-			toast({
-				title: 'Update Failed',
+			toast('Update Failed', {
 				description:
 					error.response?.data?.message || 'Failed to update profile.',
-				variant: 'destructive',
 			});
 		},
 	});
@@ -158,10 +154,8 @@ export default function SettingsPage() {
 		if (!file) return;
 
 		if (!file.type.startsWith('image/')) {
-			toast({
-				title: 'Invalid File',
+			toast('Invalid File', {
 				description: 'Please select an image file.',
-				variant: 'destructive',
 			});
 			return;
 		}
@@ -214,17 +208,14 @@ export default function SettingsPage() {
 
 			if (uploadResult.secure_url) {
 				setUrl(uploadResult.secure_url);
-				toast({
-					title: 'Upload Successful',
+				toast.success('Upload Successful', {
 					description: `${type === 'avatar' ? 'Avatar' : 'Banner'} updated.`,
 				});
 			}
 		} catch (error) {
 			console.error('Upload failed', error);
-			toast({
-				title: 'Upload Failed',
+			toast.error('Upload Failed', {
 				description: 'Failed to upload image. Please try again.',
-				variant: 'destructive',
 			});
 		} finally {
 			setLoader(false);

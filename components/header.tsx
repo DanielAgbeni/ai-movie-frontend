@@ -199,9 +199,9 @@ export function Header() {
 						</SheetTrigger>
 						<SheetContent
 							side="right"
-							className="w-[300px] sm:w-[400px]">
-							<SheetHeader className="mb-6">
-								<SheetTitle className="text-left">
+							className="w-[300px] sm:w-[400px] p-0">
+							<SheetHeader className="p-6 text-left">
+								<SheetTitle>
 									<Link
 										href="/"
 										className="flex items-center gap-2"
@@ -220,7 +220,7 @@ export function Header() {
 								</SheetTitle>
 							</SheetHeader>
 
-							<div className="flex flex-col gap-6">
+							<div className="flex flex-col gap-6 px-6">
 								<form
 									onSubmit={handleSearch}
 									className="relative w-full">

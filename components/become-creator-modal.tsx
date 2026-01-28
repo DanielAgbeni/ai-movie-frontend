@@ -3,7 +3,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { setupCreatorProfile } from '@/api/creator';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useToast } from '@/components/ui/use-toast';
 import {
 	Dialog,
 	DialogContent,
@@ -28,6 +27,7 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 const creatorSchema = z.object({
 	displayName: z.string().min(2, 'Display name must be at least 2 characters'),
@@ -49,7 +49,6 @@ export function BecomeCreatorModal({
 	open,
 	onOpenChange,
 }: BecomeCreatorModalProps) {
-	const { toast } = useToast();
 	const queryClient = useQueryClient();
 	const router = useRouter();
 	const user = useAuthStore((state) => state.user);
@@ -80,8 +79,7 @@ export function BecomeCreatorModal({
 				});
 			}
 
-			toast({
-				title: 'Welcome, Creator!',
+			toast('Welcome, Creator!', {
 				description: 'Your creator profile has been set up successfully.',
 			});
 
@@ -92,11 +90,9 @@ export function BecomeCreatorModal({
 			router.push('/upload');
 		},
 		onError: (error: any) => {
-			toast({
-				title: 'Error',
+			toast.error('Error', {
 				description:
 					error.response?.data?.message || 'Failed to create creator profile',
-				variant: 'destructive',
 			});
 		},
 	});

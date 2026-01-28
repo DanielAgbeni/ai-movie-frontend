@@ -22,7 +22,8 @@ export type ViewResponse = {
 export type CommentUser = {
 	_id: string;
 	email: string;
-	// Add other user fields if populated
+	name?: string;
+	avatarUrl?: string;
 };
 
 export type Comment = {

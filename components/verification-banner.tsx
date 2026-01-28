@@ -5,13 +5,12 @@ import { AlertCircle, CheckCircle2, Loader2, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser, useIsAuthenticated } from '@/store/useAuthStore';
 import { resendVerificationEmail } from '@/api/auth';
-import { useToast } from '@/components/ui/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { toast } from 'sonner';
 
 export function VerificationBanner() {
 	const user = useUser();
 	const isAuthenticated = useIsAuthenticated();
-	const { toast } = useToast();
 	const [isLoading, setIsLoading] = useState(false);
 	const [isSent, setIsSent] = useState(false);
 
@@ -25,16 +24,13 @@ export function VerificationBanner() {
 		try {
 			await resendVerificationEmail(user.email);
 			setIsSent(true);
-			toast({
-				title: 'Email Sent',
+			toast('Email Sent', {
 				description: 'Verification email has been sent successfully.',
 			});
 		} catch (error: any) {
-			toast({
-				title: 'Error',
+			toast.error('Error', {
 				description:
 					error.response?.data?.message || 'Failed to send verification email.',
-				variant: 'destructive',
 			});
 		} finally {
 			setIsLoading(false);

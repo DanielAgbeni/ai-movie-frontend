@@ -41,11 +41,7 @@ import MuxPlayer from '@mux/mux-player-react';
 import { mapMovieToVideoCard, formatNumber } from '@/lib/movie-utils';
 import { CommentSection } from '@/components/comments/comment-section';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useToast } from '@/components/ui/use-toast';
-
-// If you already have these globally, remove the redeclare.
-// type ApiRequestResponseType<T> = any;
-// type Movie = any;
+import { toast } from 'sonner';
 
 export default function WatchPage() {
 	const params = useParams();
@@ -53,7 +49,6 @@ export default function WatchPage() {
 	const router = useRouter();
 
 	const { isAuthenticated, user } = useAuthStore();
-	const { toast } = useToast();
 	const queryClient = useQueryClient();
 
 	const [showFullDescription, setShowFullDescription] = useState(false);
@@ -187,10 +182,8 @@ export default function WatchPage() {
 			}
 		},
 		onError: () => {
-			toast({
-				title: 'Error',
+			toast.error('Error', {
 				description: 'Failed to update like',
-				variant: 'destructive',
 			});
 		},
 	});
@@ -205,10 +198,8 @@ export default function WatchPage() {
 				queryClient.invalidateQueries({ queryKey: ['likeStatus', id] });
 		},
 		onError: () => {
-			toast({
-				title: 'Error',
+			toast.error('Error', {
 				description: 'Failed to update dislike',
-				variant: 'destructive',
 			});
 		},
 	});
@@ -227,10 +218,8 @@ export default function WatchPage() {
 			});
 		},
 		onError: () => {
-			toast({
-				title: 'Error',
+			toast.error('Error', {
 				description: 'Failed to update subscription',
-				variant: 'destructive',
 			});
 		},
 	});
@@ -238,10 +227,8 @@ export default function WatchPage() {
 	const handleAuthAction = useCallback(
 		(action: () => void) => {
 			if (!isAuthenticated) {
-				toast({
-					title: 'Unauthorized',
+				toast.error('Unauthorized', {
 					description: 'Please sign in to perform this action',
-					variant: 'destructive',
 				});
 				router.push('/login');
 				return;
@@ -371,7 +358,7 @@ export default function WatchPage() {
 											queryClient.invalidateQueries({
 												queryKey: ['playback', id],
 											});
-											toast({ description: 'Refreshing status...' });
+											toast.info('Refreshing status...');
 										}}>
 										Refresh Status
 									</Button>
