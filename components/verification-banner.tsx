@@ -55,20 +55,20 @@ export function VerificationBanner() {
 	}
 
 	return (
-		<Alert className="rounded-none border-x-0 border-t-0 border-b border-amber-500/20 bg-amber-500/10 text-amber-900 dark:text-amber-200">
-			<AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-			<AlertTitle className="text-amber-800 dark:text-amber-300">
+		<Alert className="rounded-none border-x-0 border-t-0 border-b border-amber-600 bg-amber-600 text-white dark:border-amber-600 dark:bg-amber-600 dark:text-white">
+			<AlertCircle className="h-4 w-4 text-white" />
+			<AlertTitle className="text-white">
 				Email Verification Required
 			</AlertTitle>
 			<AlertDescription className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-2 sm:mt-0">
-				<span className="text-amber-800/90 dark:text-amber-200/90">
+				<span className="text-white/90">
 					Your email address <strong>{user.email}</strong> has not been verified
 					yet. Please verify your email to access all features.
 				</span>
 				<Button
 					size="sm"
 					variant="outline"
-					className="w-full sm:w-auto border-amber-500/30 bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 hover:text-amber-800 dark:border-amber-400/30 dark:text-amber-300 dark:hover:bg-amber-400/20 dark:hover:text-amber-200 whitespace-nowrap"
+					className="w-full sm:w-auto border-white/20 bg-white/20 text-white hover:bg-white/30 hover:text-white whitespace-nowrap"
 					onClick={handleResend}
 					disabled={isLoading}>
 					{isLoading ? (

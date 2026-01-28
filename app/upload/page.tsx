@@ -544,7 +544,7 @@ function UploadPage() {
 
 						<Card className="border-border bg-card">
 							<CardHeader>
-								<CardTitle>Poster / Thumbnail</CardTitle>
+								<CardTitle>Poster / Thumbnail (Optional)</CardTitle>
 								<CardDescription>
 									Upload an engaging cover image
 								</CardDescription>

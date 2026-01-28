@@ -59,3 +59,10 @@ export const logoutUser = () => {
 export const resendVerificationEmail = (email: string) => {
 	return api.post('/api/v1/auth/resend-verification', { email });
 };
+
+/**
+ * Get current user data
+ */
+export const getMe = () => {
+	return api.get<ApiResponse<{ user: User }>>('/api/v1/auth/me');
+};

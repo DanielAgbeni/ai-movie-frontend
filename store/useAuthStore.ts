@@ -18,6 +18,7 @@ type AuthActions = {
 	getAccessToken: () => string | null;
 	getRefreshToken: () => string | null;
 	setRefreshing: (isRefreshing: boolean) => void;
+	updateUser: (user: User) => void;
 };
 
 type AuthStore = AuthState & AuthActions;
@@ -34,6 +35,7 @@ export const useAuthStore = create<AuthStore>()(
 			isRefreshing: false,
 
 			// Actions
+
 			setAuth: (data: LoginResponseData) => {
 				set({
 					user: data.user,
@@ -42,6 +44,10 @@ export const useAuthStore = create<AuthStore>()(
 					expiresIn: data.expiresIn,
 					isAuthenticated: true,
 				});
+			},
+
+			updateUser: (user: User) => {
+				set({ user });
 			},
 
 			setAccessToken: (token: string, expiresIn?: number) => {

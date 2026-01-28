@@ -16,6 +16,7 @@ import {
 	Loader2,
 } from 'lucide-react';
 import { ImageCropper } from '@/components/ui/image-cropper';
+import { Header } from '@/components/header';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -254,6 +255,7 @@ export default function SettingsPage() {
 
 	return (
 		<div className="min-h-screen bg-background">
+			<Header />
 			<div className="container mx-auto px-4 py-8">
 				<div className="max-w-4xl mx-auto">
 					<h1 className="text-4xl font-bold text-foreground mb-8">Settings</h1>

@@ -11,7 +11,9 @@ import { useAuthStore } from '@/store/useAuthStore';
 export function AuthSync() {
 	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 	const expiresIn = useAuthStore((state) => state.expiresIn);
+	const updateUser = useAuthStore((state) => state.updateUser);
 
+	// Sync cookie
 	useEffect(() => {
 		// If the user is authenticated in the client store
 		if (isAuthenticated) {
@@ -26,6 +28,32 @@ export function AuthSync() {
 			}
 		}
 	}, [isAuthenticated, expiresIn]);
+
+	// Sync user data (check if verified etc)
+	useEffect(() => {
+		if (!isAuthenticated) return;
+
+		const checkAuth = async () => {
+			try {
+				const { getMe } = await import('@/api/auth');
+				const { data } = await getMe();
+				if (data.data?.user) {
+					updateUser(data.data.user);
+				}
+			} catch (error) {
+				console.error('Failed to refresh user data', error);
+			}
+		};
+
+		// Check immediately
+		checkAuth();
+
+		// Check on focus
+		const onFocus = () => checkAuth();
+		window.addEventListener('focus', onFocus);
+
+		return () => window.removeEventListener('focus', onFocus);
+	}, [isAuthenticated, updateUser]);
 
 	return null;
 }
