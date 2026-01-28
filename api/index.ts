@@ -98,6 +98,9 @@ api.interceptors.response.use(
 					useAuthStore.getState().setRefreshToken(refreshToken);
 				}
 
+				// Refresh the middleware cookie
+				document.cookie = `isAuthenticated=true; path=/; max-age=${expiresIn || 86400}`;
+
 				// Update default header
 				api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 

@@ -153,28 +153,30 @@ export default function LibraryPage() {
 							</div>
 						) : viewMode === 'grid' ? (
 							<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-								{history.map((item) => (
+								{history?.map((item) => (
 									<div
-										key={item._id}
+										key={item?._id}
 										className="group relative">
 										<VideoCard
-											id={item.movieId._id}
-											title={item.movieId.title}
-											thumbnail={item.movieId.thumbnail.url}
+											id={item?.movieId._id}
+											title={item?.movieId.title}
+											thumbnail={item?.movieId.thumbnail.url}
 											creator={{
-												name: item.movieId.creatorId.displayName,
+												name: item?.movieId.creatorId.displayName,
 												avatar: '/diverse-avatars.png', // Fallback as avatar is not in response
 											}}
-											views={`${item.movieId.stats.viewsCount} views`}
-											uploadDate={new Date(item.createdAt).toLocaleDateString()}
-											duration={formatDuration(item.movieId.durationSec)}
+											views={`${item?.movieId.stats.viewsCount} views`}
+											uploadDate={new Date(
+												item?.createdAt,
+											).toLocaleDateString()}
+											duration={formatDuration(item?.movieId.durationSec)}
 										/>
-										{item.progressSeconds > 0 && (
+										{item?.progressSeconds > 0 && (
 											<div className="absolute bottom-0 left-0 right-0 h-1 bg-background">
 												<div
 													className="h-full bg-primary transition-all"
 													style={{
-														width: `${(item.progressSeconds / item.totalDurationSeconds) * 100}%`,
+														width: `${(item?.progressSeconds / item?.totalDurationSeconds) * 100}%`,
 													}}
 												/>
 											</div>
@@ -184,22 +186,22 @@ export default function LibraryPage() {
 							</div>
 						) : (
 							<div className="space-y-3">
-								{history.map((item) => (
+								{history?.map((item) => (
 									<div
-										key={item._id}
+										key={item?._id}
 										className="flex gap-4 rounded-lg border border-border bg-card p-4 hover:bg-card/80">
 										<div className="relative h-24 w-32 shrink-0 overflow-hidden rounded">
 											<img
-												src={item.movieId.thumbnail.url || '/placeholder.svg'}
-												alt={item.movieId.title}
+												src={item?.movieId.thumbnail.url || '/placeholder.svg'}
+												alt={item?.movieId.title}
 												className="h-full w-full object-cover"
 											/>
-											{item.progressSeconds > 0 && (
+											{item?.progressSeconds > 0 && (
 												<div className="absolute bottom-0 left-0 right-0 h-1 bg-background">
 													<div
 														className="h-full bg-primary"
 														style={{
-															width: `${(item.progressSeconds / item.totalDurationSeconds) * 100}%`,
+															width: `${(item?.progressSeconds / item?.totalDurationSeconds) * 100}%`,
 														}}
 													/>
 												</div>
@@ -207,15 +209,15 @@ export default function LibraryPage() {
 										</div>
 										<div className="flex-1 py-1">
 											<h3 className="font-semibold line-clamp-2">
-												{item.movieId.title}
+												{item?.movieId.title}
 											</h3>
 											<p className="text-sm text-muted-foreground">
-												{item.movieId.creatorId.displayName}
+												{item?.movieId.creatorId.displayName}
 											</p>
 											<p className="mt-1 text-xs text-muted-foreground">
 												Watched{' '}
-												{new Date(item.lastWatchedAt).toLocaleDateString()} •{' '}
-												{item.movieId.stats.viewsCount} views
+												{new Date(item?.lastWatchedAt).toLocaleDateString()} •{' '}
+												{item?.movieId.stats.viewsCount} views
 											</p>
 										</div>
 										<div className="flex items-center gap-2">
@@ -266,22 +268,22 @@ export default function LibraryPage() {
 						) : (
 							<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 								{likedVideos
-									.filter((video) => video.movieId)
+									.filter((video) => video?.movieId)
 									.map((video) => (
 										<VideoCard
-											key={video._id}
-											id={video.movieId._id}
-											title={video.movieId.title}
-											thumbnail={video.movieId.thumbnail.url}
+											key={video?._id}
+											id={video?.movieId._id}
+											title={video?.movieId.title}
+											thumbnail={video?.movieId.thumbnail.url}
 											creator={{
-												name: video.movieId.creatorId.displayName,
+												name: video?.movieId.creatorId.displayName,
 												avatar: '/diverse-avatars.png',
 											}}
-											views={video.movieId.stats.viewsCount.toString()}
+											views={video?.movieId.stats.viewsCount.toString()}
 											uploadDate={new Date(
-												video.movieId.createdAt,
+												video?.movieId.createdAt,
 											).toLocaleDateString()}
-											duration={formatDuration(video.movieId.durationSec)}
+											duration={formatDuration(video?.movieId.durationSec)}
 										/>
 									))}
 							</div>

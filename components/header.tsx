@@ -12,6 +12,13 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Search, Upload, User, Menu, Bell } from 'lucide-react';
+import {
+	Sheet,
+	SheetContent,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger,
+} from '@/components/ui/sheet';
 
 // Add imports
 import { useRouter } from 'next/navigation';
@@ -180,12 +187,135 @@ export function Header() {
 						</>
 					)}
 
-					<Button
-						variant="ghost"
-						size="icon"
-						className="md:hidden text-foreground hover:text-primary hover:bg-primary/10">
-						<Menu className="h-5 w-5" />
-					</Button>
+					<Sheet>
+						<SheetTrigger asChild>
+							<Button
+								variant="ghost"
+								size="icon"
+								className="md:hidden text-foreground hover:text-primary hover:bg-primary/10">
+								<Menu className="h-5 w-5" />
+								<span className="sr-only">Toggle menu</span>
+							</Button>
+						</SheetTrigger>
+						<SheetContent
+							side="right"
+							className="w-[300px] sm:w-[400px]">
+							<SheetHeader className="mb-6">
+								<SheetTitle className="text-left">
+									<Link
+										href="/"
+										className="flex items-center gap-2"
+										onClick={() => {
+											// Optional: Close sheet if you had a state for it, but native behavior handles link clicks mostly fine
+											// often better to have controlled state if you want reliable closing on navigate
+										}}>
+										<Image
+											src="/logo.png"
+											alt="AI MOVIES"
+											width={120}
+											height={40}
+											className="h-10 w-auto object-contain"
+										/>
+									</Link>
+								</SheetTitle>
+							</SheetHeader>
+
+							<div className="flex flex-col gap-6">
+								<form
+									onSubmit={handleSearch}
+									className="relative w-full">
+									<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+									<Input
+										type="search"
+										placeholder="Search..."
+										className="w-full pl-10 bg-secondary/50 border-primary/30 focus:border-primary"
+										value={searchQuery}
+										onChange={(e) => setSearchQuery(e.target.value)}
+									/>
+								</form>
+
+								<nav className="flex flex-col gap-4">
+									<Link
+										href="/browse"
+										className="text-lg font-medium text-foreground/80 transition-colors hover:text-foreground">
+										Browse
+									</Link>
+									<Link
+										href="/trending"
+										className="text-lg font-medium text-foreground/80 transition-colors hover:text-foreground">
+										Trending
+									</Link>
+									<Link
+										href="/marketplace"
+										className="text-lg font-medium text-foreground/80 transition-colors hover:text-foreground">
+										Marketplace
+									</Link>
+								</nav>
+
+								<div className="h-px bg-border my-2" />
+
+								<div className="flex flex-col gap-3">
+									{isAuthenticated ? (
+										<>
+											<div className="flex items-center gap-3 mb-2">
+												<Avatar className="h-10 w-10">
+													<AvatarImage src={user?.avatarUrl} />
+													<AvatarFallback>
+														{user?.email?.charAt(0).toUpperCase() || 'U'}
+													</AvatarFallback>
+												</Avatar>
+												<div className="flex flex-col">
+													<span className="font-medium text-sm">
+														{user?.email || 'User'}
+													</span>
+												</div>
+											</div>
+
+											<Link
+												href="/channel"
+												className="text-sm font-medium text-foreground/80 hover:text-foreground">
+												Your Channel
+											</Link>
+											<Link
+												href="/dashboard"
+												className="text-sm font-medium text-foreground/80 hover:text-foreground">
+												Creator Dashboard
+											</Link>
+											<Link
+												href="/library"
+												className="text-sm font-medium text-foreground/80 hover:text-foreground">
+												Your Library
+											</Link>
+											<Link
+												href="/settings"
+												className="text-sm font-medium text-foreground/80 hover:text-foreground">
+												Settings
+											</Link>
+											<button
+												onClick={handleLogout}
+												className="text-sm font-medium text-red-500 hover:text-red-400 text-left mt-2">
+												Sign Out
+											</button>
+										</>
+									) : (
+										<>
+											<Button
+												variant="outline"
+												asChild
+												className="w-full justify-start">
+												<Link href="/login">Sign In</Link>
+											</Button>
+											<Button
+												asChild
+												className="w-full justify-start">
+												<Link href="/signup">Sign Up</Link>
+											</Button>
+										</>
+									)}
+								</div>
+							</div>
+						</SheetContent>
+					</Sheet>
 				</div>
 			</div>
 		</header>

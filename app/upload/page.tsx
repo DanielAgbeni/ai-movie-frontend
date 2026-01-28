@@ -356,7 +356,7 @@ function UploadPage() {
 
 	const requestData = useMemo<CreateMovieRequest | null>(() => {
 		if (!videoUploadId) return null;
-		if (!title.trim() || !description.trim()) return null;
+		if (!title.trim()) return null;
 
 		return {
 			title: title.trim(),
@@ -406,10 +406,10 @@ function UploadPage() {
 			return;
 		}
 
-		if (!title.trim() || !description.trim()) {
+		if (!title.trim()) {
 			toast({
 				title: 'Required',
-				description: 'Please fill in title and description',
+				description: 'Please fill in the title',
 				variant: 'destructive',
 			});
 			return;
@@ -637,7 +637,7 @@ function UploadPage() {
 								</div>
 
 								<div className="space-y-2">
-									<Label htmlFor="description">Description *</Label>
+									<Label htmlFor="description">Description (Optional)</Label>
 									<Textarea
 										id="description"
 										value={description}
@@ -767,8 +767,7 @@ function UploadPage() {
 									createMovieMutation.isPending ||
 									!!createdMovieId ||
 									!videoUploadId ||
-									!title.trim() ||
-									!description.trim()
+									!title.trim()
 								}>
 								{createMovieMutation.isPending ? (
 									<>
