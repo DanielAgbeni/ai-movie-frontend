@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { QueryProvider } from '@/components/providers/query-provider';
 import './globals.css';
-import { Toast, ToastProvider } from '@/components/ui/toast';
+import { Toaster } from '@/components/ui/toaster';
 import { VerificationBanner } from '@/components/verification-banner';
 
 const _geist = Geist({ subsets: ['latin'] });
@@ -29,14 +29,12 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className={`font-sans antialiased`}>
-				<ToastProvider>
-					<QueryProvider>
-						<VerificationBanner />
-						{children}
-					</QueryProvider>
-					<Toast />
-					<Analytics />
-				</ToastProvider>
+				<QueryProvider>
+					<VerificationBanner />
+					{children}
+				</QueryProvider>
+				<Toaster />
+				<Analytics />
 			</body>
 		</html>
 	);
