@@ -7,6 +7,7 @@ import './globals.css';
 import { VerificationBanner } from '@/components/verification-banner';
 
 import { AuthSync } from '@/components/providers/auth-sync';
+import { SocketProvider } from '@/components/providers/socket-provider';
 import { Toaster } from '@/components/ui/sonner';
 
 const _geist = Geist({ subsets: ['latin'] });
@@ -33,8 +34,10 @@ export default function RootLayout({
 			<body className={`font-sans antialiased`}>
 				<QueryProvider>
 					<AuthSync />
-					<VerificationBanner />
-					{children}
+					<SocketProvider>
+						<VerificationBanner />
+						{children}
+					</SocketProvider>
 				</QueryProvider>
 				<Toaster />
 				<Analytics />

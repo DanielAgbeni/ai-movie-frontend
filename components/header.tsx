@@ -11,7 +11,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, Upload, User, Menu, Bell } from 'lucide-react';
+import { Search, Upload, User, Menu } from 'lucide-react';
 import {
 	Sheet,
 	SheetContent,
@@ -26,6 +26,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { logoutUser } from '@/api/auth';
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { NotificationDropdown } from '@/components/notifications';
 
 export function Header() {
 	const router = useRouter();
@@ -111,12 +112,9 @@ export function Header() {
 				<div className="flex items-center gap-3">
 					{isAuthenticated ? (
 						<>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="hidden md:flex text-foreground hover:text-primary hover:bg-primary/10">
-								<Bell className="h-5 w-5" />
-							</Button>
+							<div className="hidden md:flex">
+								<NotificationDropdown />
+							</div>
 
 							<Button
 								asChild

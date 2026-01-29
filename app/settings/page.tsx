@@ -38,6 +38,10 @@ import {
 
 import { getCreatorProfile, updateCreatorProfile } from '@/api/creator';
 import { getCloudinarySignature } from '@/api/upload';
+import {
+	useNotificationPreferences,
+	useUpdateNotificationPreferences,
+} from '@/hooks/useNotifications';
 import { toast } from 'sonner';
 
 const profileSchema = z.object({
@@ -223,12 +227,32 @@ export default function SettingsPage() {
 	};
 
 	// Other Settings State (Mock for now, preserving existing UI)
-	const [notifications, setNotifications] = useState({
+	const notificationPrefsQuery = useNotificationPreferences();
+	const updatePreferencesMutation = useUpdateNotificationPreferences();
+
+	const notificationPrefs = notificationPrefsQuery.data ?? {
 		newFollowers: true,
 		newComments: true,
 		purchaseAlerts: true,
 		weeklyDigest: false,
-	});
+	};
+
+	const handleNotificationChange = (
+		key: keyof NotificationPreferences,
+		value: boolean,
+	) => {
+		updatePreferencesMutation.mutate(
+			{ [key]: value },
+			{
+				onSuccess: () => {
+					toast.success('Preference updated');
+				},
+				onError: () => {
+					toast.error('Failed to update preference');
+				},
+			},
+		);
+	};
 
 	const [privacy, setPrivacy] = useState({
 		profileVisible: true,
@@ -567,87 +591,90 @@ export default function SettingsPage() {
 									Notification Preferences
 								</h2>
 
-								<div className="space-y-6">
-									<div className="flex items-center justify-between">
-										<div>
-											<p className="font-medium text-foreground">
-												New Followers
-											</p>
-											<p className="text-sm text-muted-foreground">
-												Get notified when someone follows you
-											</p>
-										</div>
-										<Switch
-											checked={notifications.newFollowers}
-											onCheckedChange={(checked) =>
-												setNotifications({
-													...notifications,
-													newFollowers: checked,
-												})
-											}
-										/>
+								{notificationPrefsQuery.isLoading ? (
+									<div className="flex items-center justify-center py-8">
+										<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
 									</div>
-
-									<div className="flex items-center justify-between">
-										<div>
-											<p className="font-medium text-foreground">Comments</p>
-											<p className="text-sm text-muted-foreground">
-												Get notified when someone comments on your videos
-											</p>
-										</div>
-										<Switch
-											checked={notifications.newComments}
-											onCheckedChange={(checked) =>
-												setNotifications({
-													...notifications,
-													newComments: checked,
-												})
-											}
-										/>
+								) : notificationPrefsQuery.isError ? (
+									<div className="text-center py-8 text-muted-foreground">
+										<p>Failed to load preferences.</p>
+										<p className="text-sm">
+											Notification preferences are only available for creators.
+										</p>
 									</div>
-
-									<div className="flex items-center justify-between">
-										<div>
-											<p className="font-medium text-foreground">
-												Purchase Alerts
-											</p>
-											<p className="text-sm text-muted-foreground">
-												Get notified when someone purchases your content
-											</p>
+								) : (
+									<div className="space-y-6">
+										<div className="flex items-center justify-between">
+											<div>
+												<p className="font-medium text-foreground">
+													New Followers
+												</p>
+												<p className="text-sm text-muted-foreground">
+													Get notified when someone follows you
+												</p>
+											</div>
+											<Switch
+												checked={notificationPrefs.newFollowers}
+												onCheckedChange={(checked) =>
+													handleNotificationChange('newFollowers', checked)
+												}
+												disabled={updatePreferencesMutation.isPending}
+											/>
 										</div>
-										<Switch
-											checked={notifications.purchaseAlerts}
-											onCheckedChange={(checked) =>
-												setNotifications({
-													...notifications,
-													purchaseAlerts: checked,
-												})
-											}
-										/>
-									</div>
 
-									<div className="flex items-center justify-between">
-										<div>
-											<p className="font-medium text-foreground">
-												Weekly Digest
-											</p>
-											<p className="text-sm text-muted-foreground">
-												Receive a weekly summary of your activity
-											</p>
+										<div className="flex items-center justify-between">
+											<div>
+												<p className="font-medium text-foreground">Comments</p>
+												<p className="text-sm text-muted-foreground">
+													Get notified when someone comments on your videos
+												</p>
+											</div>
+											<Switch
+												checked={notificationPrefs.newComments}
+												onCheckedChange={(checked) =>
+													handleNotificationChange('newComments', checked)
+												}
+												disabled={updatePreferencesMutation.isPending}
+											/>
 										</div>
-										<Switch
-											checked={notifications.weeklyDigest}
-											onCheckedChange={(checked) =>
-												setNotifications({
-													...notifications,
-													weeklyDigest: checked,
-												})
-											}
-										/>
-									</div>
 
-									<Button>Save Preferences</Button>
-								</div>
+										<div className="flex items-center justify-between">
+											<div>
+												<p className="font-medium text-foreground">
+													Purchase Alerts
+												</p>
+												<p className="text-sm text-muted-foreground">
+													Get notified when someone purchases your content
+												</p>
+											</div>
+											<Switch
+												checked={notificationPrefs.purchaseAlerts}
+												onCheckedChange={(checked) =>
+													handleNotificationChange('purchaseAlerts', checked)
+												}
+												disabled={updatePreferencesMutation.isPending}
+											/>
+										</div>
+
+										<div className="flex items-center justify-between">
+											<div>
+												<p className="font-medium text-foreground">
+													Weekly Digest
+												</p>
+												<p className="text-sm text-muted-foreground">
+													Receive a weekly summary of your activity
+												</p>
+											</div>
+											<Switch
+												checked={notificationPrefs.weeklyDigest}
+												onCheckedChange={(checked) =>
+													handleNotificationChange('weeklyDigest', checked)
+												}
+												disabled={updatePreferencesMutation.isPending}
+											/>
+										</div>
+									</div>
+								)}
 							</div>
 						</TabsContent>
 

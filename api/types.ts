@@ -456,6 +456,69 @@ declare global {
 			pages: number;
 		};
 	};
+
+	// Notification Types
+	export type NotificationType =
+		| 'video_published' // Assuming snake_case for consistency
+		| 'comment_reply'
+		| 'video_comment' // Replaces NEW_COMMENT
+		| 'new_follower'
+		| 'purchase_alert'
+		| 'comment_liked'
+		| 'system';
+
+	export type NotificationPayload = {
+		movieId?: string;
+		movieTitle?: string;
+		movieSlug?: string;
+		commentId?: string;
+		commentPreview?: string;
+		followerId?: string;
+		followerName?: string;
+		likerId?: string;
+		likerName?: string;
+		commenterId?: string;
+		commenterName?: string;
+		purchaseAmount?: number;
+		currency?: string;
+		// Backward compatibility if needed, though likely not with new backend
+		videoId?: string;
+		creatorId?: string;
+	};
+
+	export type AppNotification = {
+		_id: string;
+		userId?: string;
+		recipientId: string;
+		recipientType: string;
+		type: NotificationType;
+		title: string;
+		body?: string; // Backend returns body, not message
+		message?: string; // Keeping for backward compat if needed, but backend sends body
+		data?: NotificationPayload; // Backend sends data, not payload
+		payload?: NotificationPayload; // Keeping for backward compat
+		isRead: boolean; // Backend sends isRead, not read
+		read?: boolean; // Keeping for backward compat
+		idempotencyKey?: string;
+		createdAt: string;
+		updatedAt?: string;
+		__v?: number;
+	};
+
+	export type NotificationsResponse = {
+		notifications: AppNotification[];
+		unreadCount: number;
+		total: number;
+		page: number;
+		totalPages: number;
+	};
+
+	export type NotificationPreferences = {
+		newFollowers: boolean;
+		newComments: boolean;
+		purchaseAlerts: boolean;
+		weeklyDigest: boolean;
+	};
 }
 
 export {};
