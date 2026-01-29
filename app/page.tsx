@@ -178,11 +178,11 @@ export default function HomePage() {
 						Join thousands of creators earning from their AI movies. Free to
 						upload, you only pay when you profit.
 					</p>
-					<Button
-						size="lg"
+					<Link
+						href="/upload"
 						className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20">
 						Start Creating Today
-					</Button>
+					</Link>
 				</section>
 			</main>
 
