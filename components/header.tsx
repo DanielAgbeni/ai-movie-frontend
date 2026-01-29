@@ -112,9 +112,7 @@ export function Header() {
 				<div className="flex items-center gap-3">
 					{isAuthenticated ? (
 						<>
-							<div className="hidden md:flex">
-								<NotificationDropdown />
-							</div>
+							<NotificationDropdown />
 
 							<Button
 								asChild

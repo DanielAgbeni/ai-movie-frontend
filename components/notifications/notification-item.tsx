@@ -56,8 +56,8 @@ function NotificationItemComponent({
 		if (payload) {
 			switch (notification.type) {
 				case 'video_published':
-					if (payload.movieId || payload.videoSlug) {
-						router.push(`/watch/${payload.movieId || payload.videoSlug}`);
+					if (payload.movieId || payload.movieSlug) {
+						router.push(`/watch/${payload.movieId || payload.movieSlug}`);
 					}
 					break;
 				case 'comment_reply':
