@@ -8,6 +8,7 @@ type AuthState = {
 	expiresIn: number | null;
 	isAuthenticated: boolean;
 	isRefreshing: boolean;
+	_hasHydrated: boolean;
 };
 
 type AuthActions = {
@@ -19,6 +20,7 @@ type AuthActions = {
 	getRefreshToken: () => string | null;
 	setRefreshing: (isRefreshing: boolean) => void;
 	updateUser: (user: User) => void;
+	setHasHydrated: (state: boolean) => void;
 };
 
 type AuthStore = AuthState & AuthActions;
@@ -33,6 +35,7 @@ export const useAuthStore = create<AuthStore>()(
 			expiresIn: null,
 			isAuthenticated: false,
 			isRefreshing: false,
+			_hasHydrated: false,
 
 			// Actions
 
@@ -77,10 +80,16 @@ export const useAuthStore = create<AuthStore>()(
 			setRefreshing: (isRefreshing: boolean) => {
 				set({ isRefreshing });
 			},
+			setHasHydrated: (state: boolean) => {
+				set({ _hasHydrated: state });
+			},
 		}),
 		{
 			name: 'auth-storage',
 			storage: createJSONStorage(() => localStorage),
+			onRehydrateStorage: () => (state) => {
+				state?.setHasHydrated(true);
+			},
 			partialize: (state) => ({
 				user: state.user,
 				accessToken: state.accessToken,
@@ -100,3 +109,4 @@ export const useIsAuthenticated = () =>
 export const useAccessToken = () => useAuthStore((state) => state.accessToken);
 export const useIsRefreshing = () =>
 	useAuthStore((state) => state.isRefreshing);
+export const useHasHydrated = () => useAuthStore((state) => state._hasHydrated);
