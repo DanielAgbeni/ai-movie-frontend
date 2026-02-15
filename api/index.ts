@@ -125,8 +125,11 @@ api.interceptors.response.use(
 				document.cookie =
 					'isAuthenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
 
-				// Redirect to login page
-				if (typeof window !== 'undefined') {
+				// Redirect to login page only if not already there
+				if (
+					typeof window !== 'undefined' &&
+					!window.location.pathname.includes('/login')
+				) {
 					window.location.href = '/login';
 				}
 
