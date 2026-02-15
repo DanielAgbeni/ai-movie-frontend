@@ -26,6 +26,10 @@ export function AuthSync() {
 				// We use the stored expiresIn or default to 1 day
 				document.cookie = `isAuthenticated=true; path=/; max-age=${expiresIn || 86400}`;
 			}
+		} else {
+			// Remove cookie if user is not authenticated
+			document.cookie =
+				'isAuthenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
 		}
 	}, [isAuthenticated, expiresIn]);
 

@@ -121,6 +121,15 @@ api.interceptors.response.use(
 				// Clear auth state
 				useAuthStore.getState().logout();
 
+				// Clear cookie manually to be safe
+				document.cookie =
+					'isAuthenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+
+				// Redirect to login page
+				if (typeof window !== 'undefined') {
+					window.location.href = '/login';
+				}
+
 				return Promise.reject(refreshError);
 			}
 		}
