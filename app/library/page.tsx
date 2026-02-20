@@ -276,7 +276,7 @@ export default function LibraryPage() {
 											key={video?._id}
 											id={video?.movieId._id}
 											title={video?.movieId.title}
-											thumbnail={video?.movieId.thumbnail.url}
+											thumbnail={video?.movieId?.thumbnail?.url}
 											creator={{
 												name: video?.movieId.creatorId.displayName,
 												avatar: '/diverse-avatars.png',

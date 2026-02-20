@@ -22,14 +22,14 @@ export const StatsCardGrid = memo(function StatsCardGrid({
 			/>
 			<StatsCard
 				title="Total Views"
-				value={`${(stats.totalViews / 1000000).toFixed(1)}M`}
+				value={`${stats.totalViews}`}
 				subtitle="Across all videos"
 				icon={Eye}
 			/>
 			<StatsCard
 				title="Subscribers"
-				value={`${(stats.subscribers / 1000000).toFixed(1)}M`}
-				subtitle="+12.5K this week"
+				value={`${stats.subscribers}`}
+				subtitle="Total subscribers"
 				icon={Users}
 			/>
 			<StatsCard

@@ -27,24 +27,88 @@ import {
 	useIsAuthenticated,
 	useIsRefreshing,
 } from '@/store/useAuthStore';
+import api from '@/api';
 
-// Dummy stats - will be replaced with real data from API in the future
-const stats: DashboardStats = {
-	totalEarnings: 0,
-	monthlyEarnings: 0,
-	totalViews: 0,
-	subscribers: 0,
-	totalVideos: 0,
-	avgViewDuration: '0:00',
+const getDashboardStats = async () => {
+	const res = await api.get('/api/v1/creator/dashboard');
+	return res.data;
 };
 
-const transactions: Transaction[] = [];
+const getEarningsSummary = async () => {
+	const res = await api.get('/api/v1/creator/transactions/summary');
+	return res.data;
+};
+
+const getTransactions = async () => {
+	const res = await api.get('/api/v1/creator/transactions', {
+		params: { page: 1, limit: 10 },
+	});
+	return res.data;
+};
 
 export default function DashboardPage() {
 	const user = useUser();
 	const isAuthenticated = useIsAuthenticated();
 	const isRefreshing = useIsRefreshing();
 	const [showAccessDenied, setShowAccessDenied] = useState(false);
+
+	const { data: dashboardStatsResponse } = useQuery({
+		queryKey: ['dashboardStats'],
+		queryFn: getDashboardStats,
+		enabled: isAuthenticated,
+	});
+
+	const { data: earningsSummaryResponse } = useQuery({
+		queryKey: ['earningsSummary'],
+		queryFn: getEarningsSummary,
+		enabled: isAuthenticated && (user?.role === 'creator' || user?.role === 'admin'),
+	});
+
+	const { data: transactionsResponse } = useQuery({
+		queryKey: ['transactions'],
+		queryFn: getTransactions,
+		enabled: isAuthenticated && (user?.role === 'creator' || user?.role === 'admin'),
+	});
+
+	const stats: DashboardStats = useMemo(() => {
+		const s = dashboardStatsResponse?.data?.dashboard?.stats;
+		const c = dashboardStatsResponse?.data?.dashboard?.creator;
+		
+		const totalEarnings =
+			(earningsSummaryResponse?.data?.lifetimeEarningsCents || 0) / 100;
+		const monthlyEarnings =
+			(earningsSummaryResponse?.data?.thisMonthCents || 0) / 100;
+
+		return {
+			totalEarnings,
+			monthlyEarnings,
+			totalViews: s?.totalViews || 0,
+			subscribers: c?.subscribersCount || 0,
+			totalVideos: s?.totalMovies || 0,
+			avgViewDuration: '0:00',
+		};
+	}, [dashboardStatsResponse, earningsSummaryResponse]);
+
+	const transactions: Transaction[] = useMemo(() => {
+		const ledgerEntries = transactionsResponse?.data?.data || [];
+		return ledgerEntries.map((entry: any) => ({
+			id: entry.id,
+			type: entry.order?.type === 'RENT' ? 'Rental' : 'Purchase',
+			video: entry.order?.movieId || 'Unknown Video', // If we don't populate movie titles, might just show ID or default
+			amount: Number((entry.amountCents / 100).toFixed(2)),
+			date: new Date(entry.createdAt).toLocaleDateString(),
+			buyer: 'User', // Backend currently doesn't populate exact buyer name in payload unless order is deep populated
+		}));
+	}, [transactionsResponse]);
+
+	const earningsBreakdown = useMemo(() => {
+		const breakdown = earningsSummaryResponse?.data?.breakdown;
+		if (!breakdown) return undefined;
+		
+		// To match EarningsBreakdownCard's EarningSource[] format exactly
+		// We'd map the static icons inside the component, but we can pass the data
+		return undefined; // We'll map the actual values inline below
+	}, [earningsSummaryResponse]);
 
 	const handleWithdraw = () => {
 		// TODO: Implement withdrawal
@@ -198,9 +262,33 @@ export default function DashboardPage() {
 						className="space-y-6">
 						<EarningsCardGrid
 							stats={stats}
+							availableBalance={(earningsSummaryResponse?.data?.availableBalanceCents || 0) / 100}
 							onWithdraw={handleWithdraw}
 						/>
-						<EarningsBreakdownCard />
+						{earningsSummaryResponse?.data?.breakdown && (
+							<EarningsBreakdownCard
+								sources={[
+									{
+										icon: require('lucide-react').Video,
+										title: 'Video Rentals',
+										subtitle: `${earningsSummaryResponse.data.breakdown.videoRentals.transactions} transactions`,
+										amount: earningsSummaryResponse.data.breakdown.videoRentals.amountCents / 100,
+									},
+									{
+										icon: require('lucide-react').Download,
+										title: 'Video Purchases',
+										subtitle: `${earningsSummaryResponse.data.breakdown.videoPurchases.transactions} transactions`,
+										amount: earningsSummaryResponse.data.breakdown.videoPurchases.amountCents / 100,
+									},
+									{
+										icon: require('lucide-react').Eye,
+										title: 'Ad Revenue',
+										subtitle: `${earningsSummaryResponse.data.breakdown.adRevenue.impressions} impressions`,
+										amount: earningsSummaryResponse.data.breakdown.adRevenue.amountCents / 100,
+									},
+								]}
+							/>
+						)}
 					</TabsContent>
 
 					{/* Analytics Tab */}

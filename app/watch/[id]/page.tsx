@@ -36,6 +36,7 @@ import {
 	getWatchProgress,
 	saveWatchProgress,
 } from '@/api/engagement';
+import { createCheckoutSession } from '@/api/payments';
 import MuxPlayer from '@mux/mux-player-react';
 
 import { mapMovieToVideoCard, formatNumber } from '@/lib/movie-utils';
@@ -164,10 +165,16 @@ export default function WatchPage() {
 		[isPlayingTrailer, isAuthenticated, saveProgress],
 	);
 
-	// View Recording
+	const hasRecordedViewRef = useRef(false);
+
 	useEffect(() => {
-		if (!id) return;
+		hasRecordedViewRef.current = false;
+	}, [id]);
+
+	const handlePlay = useCallback(() => {
+		if (!id || hasRecordedViewRef.current) return;
 		recordView(id);
+		hasRecordedViewRef.current = true;
 	}, [id]);
 
 	// Mutations
@@ -237,6 +244,27 @@ export default function WatchPage() {
 		},
 		[isAuthenticated, router, toast],
 	);
+
+	const { mutate: handleCheckout, isPending: isCheckingOut } = useMutation({
+		mutationFn: (type: 'rent' | 'buy') =>
+			createCheckoutSession({ movieId: id, type }),
+		onSuccess: (res) => {
+			const checkoutUrl = res?.data?.data?.checkoutUrl;
+			if (checkoutUrl) {
+				window.location.href = checkoutUrl;
+			} else {
+				toast.error('Error', {
+					description: 'Checkout URL not found.',
+				});
+			}
+		},
+		onError: (error: any) => {
+			toast.error('Checkout Failed', {
+				description:
+					error?.response?.data?.message || 'Failed to initialize checkout',
+			});
+		},
+	});
 
 	const relatedVideos = useMemo(() => {
 		const list =
@@ -324,6 +352,7 @@ export default function WatchPage() {
 									style={{ height: '100%', width: '100%' }}
 									autoPlay={shouldAutoplay}
 									onTimeUpdate={handleTimeUpdate}
+									onPlay={handlePlay}
 									onLoadedMetadata={() => {
 										if (
 											didInitialSeekRef.current ||
@@ -394,7 +423,15 @@ export default function WatchPage() {
 										</p>
 										<div className="flex justify-center gap-3">
 											{movie.pricing?.rentPriceCents > 0 && (
-												<Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+												<Button
+													className="bg-primary text-primary-foreground hover:bg-primary/90"
+													onClick={() =>
+														handleAuthAction(() => handleCheckout('rent'))
+													}
+													disabled={isCheckingOut}>
+													{isCheckingOut ? (
+														<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+													) : null}
 													Rent $
 													{(movie.pricing.rentPriceCents / 100).toFixed(2)}
 												</Button>
@@ -402,7 +439,14 @@ export default function WatchPage() {
 											{movie.pricing?.buyPriceCents > 0 && (
 												<Button
 													variant="outline"
-													className="border-white bg-transparent text-white hover:bg-white/10">
+													className="border-white bg-transparent text-white hover:bg-white/10"
+													onClick={() =>
+														handleAuthAction(() => handleCheckout('buy'))
+													}
+													disabled={isCheckingOut}>
+													{isCheckingOut ? (
+														<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+													) : null}
 													Buy ${(movie.pricing.buyPriceCents / 100).toFixed(2)}
 												</Button>
 											)}

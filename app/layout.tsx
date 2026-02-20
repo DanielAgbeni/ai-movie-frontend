@@ -8,6 +8,7 @@ import { VerificationBanner } from '@/components/verification-banner';
 
 import { AuthSync } from '@/components/providers/auth-sync';
 import { SocketProvider } from '@/components/providers/socket-provider';
+import { PaymentStatus } from '@/components/providers/payment-status';
 import { Toaster } from '@/components/ui/sonner';
 
 const _geist = Geist({ subsets: ['latin'] });
@@ -36,6 +37,7 @@ export default function RootLayout({
 					<AuthSync />
 					<SocketProvider>
 						<VerificationBanner />
+						<PaymentStatus />
 						{children}
 					</SocketProvider>
 				</QueryProvider>
