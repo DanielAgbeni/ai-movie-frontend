@@ -41,7 +41,7 @@ const VideoPerformanceItem = memo(function VideoPerformanceItem({
 				<div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
 					<span className="flex items-center gap-1">
 						<Eye className="h-3 w-3" />
-						{(video.views / 1000000).toFixed(1)}M views
+						{video.views.toLocaleString()} views
 					</span>
 					<span className="flex items-center gap-1">
 						<DollarSign className="h-3 w-3" />${video.earnings.toFixed(2)}

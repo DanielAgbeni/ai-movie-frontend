@@ -3,12 +3,14 @@
 import { memo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import type { DashboardStats } from './types';
 
 export interface EarningsCardGridProps {
 	stats: DashboardStats;
 	availableBalance?: number;
+	percentageChange?: number;
+	sinceDate?: string;
 	onWithdraw?: () => void;
 }
 
@@ -47,6 +49,9 @@ const MonthlyEarningsCard = memo(function MonthlyEarningsCard({
 	amount: number;
 	percentageChange: number;
 }) {
+	const isPositive = percentageChange >= 0;
+	const Icon = isPositive ? TrendingUp : TrendingDown;
+
 	return (
 		<Card className="border-border bg-card">
 			<CardHeader>
@@ -56,9 +61,9 @@ const MonthlyEarningsCard = memo(function MonthlyEarningsCard({
 			</CardHeader>
 			<CardContent>
 				<div className="mb-2 text-3xl font-bold">${amount.toFixed(2)}</div>
-				<div className="flex items-center gap-1 text-sm text-green-500">
-					<TrendingUp className="h-4 w-4" />
-					<span>+{percentageChange}% from last month</span>
+				<div className={`flex items-center gap-1 text-sm ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+					<Icon className="h-4 w-4" />
+					<span>{isPositive ? '+' : ''}{percentageChange}% from last month</span>
 				</div>
 			</CardContent>
 		</Card>
@@ -91,9 +96,15 @@ const LifetimeEarningsCard = memo(function LifetimeEarningsCard({
 
 export const EarningsCardGrid = memo(function EarningsCardGrid({
 	stats,
-	availableBalance = 4287.32,
+	availableBalance = 0,
+	percentageChange = 0,
+	sinceDate,
 	onWithdraw,
 }: EarningsCardGridProps) {
+	const formattedDate = sinceDate
+		? new Date(sinceDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+		: 'N/A';
+
 	return (
 		<div className="grid gap-6 md:grid-cols-3">
 			<BalanceCard
@@ -102,11 +113,11 @@ export const EarningsCardGrid = memo(function EarningsCardGrid({
 			/>
 			<MonthlyEarningsCard
 				amount={stats.monthlyEarnings}
-				percentageChange={24.5}
+				percentageChange={percentageChange}
 			/>
 			<LifetimeEarningsCard
 				amount={stats.totalEarnings}
-				startDate="January 2024"
+				startDate={formattedDate}
 			/>
 		</div>
 	);

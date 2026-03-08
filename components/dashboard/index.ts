@@ -10,6 +10,15 @@ export { DemographicsCard } from './demographics-card';
 export { WatchTimeCard } from './watch-time-card';
 export { TopVideosCard } from './top-videos-card';
 export { DashboardHeader } from './dashboard-header';
+export {
+	StatsCardGridSkeleton,
+	VideoPerformanceSkeleton,
+	TransactionsTableSkeleton,
+	VideoListSkeleton,
+	EarningsCardGridSkeleton,
+	EarningsBreakdownSkeleton,
+	AnalyticsSkeleton,
+} from './dashboard-skeletons';
 
 // Types
 export type { DashboardStats, VideoData, Transaction } from './types';

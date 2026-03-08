@@ -39,7 +39,7 @@ const TopVideoItem = memo(function TopVideoItem({
 			<div className="flex-1">
 				<p className="font-semibold leading-snug">{video.title}</p>
 				<p className="text-sm text-muted-foreground">
-					{(video.views / 1000000).toFixed(1)}M views • $
+					{video.views.toLocaleString()} views • $
 					{video.earnings.toFixed(2)} earned
 				</p>
 			</div>

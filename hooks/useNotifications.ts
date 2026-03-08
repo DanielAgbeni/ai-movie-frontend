@@ -15,6 +15,7 @@ import {
 	type GetNotificationsParams,
 } from '@/api/notifications';
 import { useNotificationStore } from '@/store/useNotificationStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
 // Query Keys
 export const notificationKeys = {
@@ -125,6 +126,7 @@ export function useUpdateNotificationPreferences() {
 // Hook to fetch initial unread count
 export function useUnreadCountQuery() {
 	const setUnreadCount = useNotificationStore((s) => s.setUnreadCount);
+	const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
 	return useQuery({
 		queryKey: notificationKeys.list({ limit: 1 }), // Minimal fetch
@@ -138,5 +140,6 @@ export function useUnreadCountQuery() {
 		},
 		refetchOnMount: true,
 		refetchOnWindowFocus: true,
+		enabled: isAuthenticated,
 	});
 }

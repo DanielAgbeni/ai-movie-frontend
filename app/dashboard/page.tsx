@@ -15,6 +15,13 @@ import {
 	DemographicsCard,
 	WatchTimeCard,
 	TopVideosCard,
+	StatsCardGridSkeleton,
+	VideoPerformanceSkeleton,
+	TransactionsTableSkeleton,
+	VideoListSkeleton,
+	EarningsCardGridSkeleton,
+	EarningsBreakdownSkeleton,
+	AnalyticsSkeleton,
 	type DashboardStats,
 	type VideoData,
 	type Transaction,
@@ -52,19 +59,19 @@ export default function DashboardPage() {
 	const isRefreshing = useIsRefreshing();
 	const [showAccessDenied, setShowAccessDenied] = useState(false);
 
-	const { data: dashboardStatsResponse } = useQuery({
+	const { data: dashboardStatsResponse, isLoading: isLoadingStats } = useQuery({
 		queryKey: ['dashboardStats'],
 		queryFn: getDashboardStats,
 		enabled: isAuthenticated,
 	});
 
-	const { data: earningsSummaryResponse } = useQuery({
+	const { data: earningsSummaryResponse, isLoading: isLoadingEarnings } = useQuery({
 		queryKey: ['earningsSummary'],
 		queryFn: getEarningsSummary,
 		enabled: isAuthenticated && (user?.role === 'creator' || user?.role === 'admin'),
 	});
 
-	const { data: transactionsResponse } = useQuery({
+	const { data: transactionsResponse, isLoading: isLoadingTransactions } = useQuery({
 		queryKey: ['transactions'],
 		queryFn: getTransactions,
 		enabled: isAuthenticated && (user?.role === 'creator' || user?.role === 'admin'),
@@ -75,7 +82,7 @@ export default function DashboardPage() {
 		const c = dashboardStatsResponse?.data?.dashboard?.creator;
 		
 		const totalEarnings =
-			(earningsSummaryResponse?.data?.lifetimeEarningsCents || 0) / 100;
+			(s?.totalEarningsCents || earningsSummaryResponse?.data?.lifetimeEarningsCents || 0) / 100;
 		const monthlyEarnings =
 			(earningsSummaryResponse?.data?.thisMonthCents || 0) / 100;
 
@@ -101,14 +108,7 @@ export default function DashboardPage() {
 		}));
 	}, [transactionsResponse]);
 
-	const earningsBreakdown = useMemo(() => {
-		const breakdown = earningsSummaryResponse?.data?.breakdown;
-		if (!breakdown) return undefined;
-		
-		// To match EarningsBreakdownCard's EarningSource[] format exactly
-		// We'd map the static icons inside the component, but we can pass the data
-		return undefined; // We'll map the actual values inline below
-	}, [earningsSummaryResponse]);
+
 
 	const handleWithdraw = () => {
 		// TODO: Implement withdrawal
@@ -143,7 +143,7 @@ export default function DashboardPage() {
 		console.log('Delete video:', movie._id);
 	};
 
-	const { data: creatorMoviesData } = useQuery({
+	const { data: creatorMoviesData, isLoading: isLoadingMovies } = useQuery({
 		queryKey: ['creatorMovies'],
 		queryFn: () => getCreatorMovies({ limit: 20 }),
 	});
@@ -200,7 +200,11 @@ export default function DashboardPage() {
 				/>
 
 				{/* Stats Cards */}
-				<StatsCardGrid stats={stats} />
+				{isLoadingStats || isLoadingEarnings ? (
+					<StatsCardGridSkeleton />
+				) : (
+					<StatsCardGrid stats={stats} />
+				)}
 
 				{/* Main Content Tabs */}
 				<Tabs
@@ -235,59 +239,82 @@ export default function DashboardPage() {
 					<TabsContent
 						value="overview"
 						className="space-y-6">
-						<VideoPerformanceCard
-							videos={recentPerformanceVideos}
-							title="Recent Performance"
-							description="Your top performing videos"
-						/>
-						<TransactionsTable transactions={transactions} />
+						{isLoadingMovies ? (
+							<VideoPerformanceSkeleton />
+						) : (
+							<VideoPerformanceCard
+								videos={recentPerformanceVideos}
+								title="Recent Performance"
+								description="Your top performing videos"
+							/>
+						)}
+						{isLoadingTransactions ? (
+							<TransactionsTableSkeleton />
+						) : (
+							<TransactionsTable transactions={transactions} />
+						)}
 					</TabsContent>
 
 					{/* Videos Tab */}
 					<TabsContent
 						value="videos"
 						className="space-y-6">
-						<VideoListCard
-							videos={creatorMovies}
-							onWatch={handleWatch}
-							onEdit={handleEdit}
-							onDownload={handleDownload}
-							onDelete={handleDelete}
-						/>
+						{isLoadingMovies ? (
+							<VideoListSkeleton />
+						) : (
+							<VideoListCard
+								videos={creatorMovies}
+								onWatch={handleWatch}
+								onEdit={handleEdit}
+								onDownload={handleDownload}
+								onDelete={handleDelete}
+							/>
+						)}
 					</TabsContent>
 
 					{/* Earnings Tab */}
 					<TabsContent
 						value="earnings"
 						className="space-y-6">
-						<EarningsCardGrid
-							stats={stats}
-							availableBalance={(earningsSummaryResponse?.data?.availableBalanceCents || 0) / 100}
-							onWithdraw={handleWithdraw}
-						/>
-						{earningsSummaryResponse?.data?.breakdown && (
-							<EarningsBreakdownCard
-								sources={[
-									{
-										icon: require('lucide-react').Video,
-										title: 'Video Rentals',
-										subtitle: `${earningsSummaryResponse.data.breakdown.videoRentals.transactions} transactions`,
-										amount: earningsSummaryResponse.data.breakdown.videoRentals.amountCents / 100,
-									},
-									{
-										icon: require('lucide-react').Download,
-										title: 'Video Purchases',
-										subtitle: `${earningsSummaryResponse.data.breakdown.videoPurchases.transactions} transactions`,
-										amount: earningsSummaryResponse.data.breakdown.videoPurchases.amountCents / 100,
-									},
-									{
-										icon: require('lucide-react').Eye,
-										title: 'Ad Revenue',
-										subtitle: `${earningsSummaryResponse.data.breakdown.adRevenue.impressions} impressions`,
-										amount: earningsSummaryResponse.data.breakdown.adRevenue.amountCents / 100,
-									},
-								]}
-							/>
+						{isLoadingEarnings ? (
+							<>
+								<EarningsCardGridSkeleton />
+								<EarningsBreakdownSkeleton />
+							</>
+						) : (
+							<>
+								<EarningsCardGrid
+									stats={stats}
+									availableBalance={(earningsSummaryResponse?.data?.availableBalanceCents || 0) / 100}
+									percentageChange={earningsSummaryResponse?.data?.percentageChangeFromLastMonth || 0}
+									sinceDate={earningsSummaryResponse?.data?.sinceDate}
+									onWithdraw={handleWithdraw}
+								/>
+								{earningsSummaryResponse?.data?.breakdown && (
+									<EarningsBreakdownCard
+										sources={[
+											{
+												icon: require('lucide-react').Video,
+												title: 'Video Rentals',
+												subtitle: `${earningsSummaryResponse.data.breakdown.videoRentals.transactions} transactions`,
+												amount: earningsSummaryResponse.data.breakdown.videoRentals.amountCents / 100,
+											},
+											{
+												icon: require('lucide-react').Download,
+												title: 'Video Purchases',
+												subtitle: `${earningsSummaryResponse.data.breakdown.videoPurchases.transactions} transactions`,
+												amount: earningsSummaryResponse.data.breakdown.videoPurchases.amountCents / 100,
+											},
+											{
+												icon: require('lucide-react').Eye,
+												title: 'Ad Revenue',
+												subtitle: `${earningsSummaryResponse.data.breakdown.adRevenue.impressions} impressions`,
+												amount: earningsSummaryResponse.data.breakdown.adRevenue.amountCents / 100,
+											},
+										]}
+									/>
+								)}
+							</>
 						)}
 					</TabsContent>
 
@@ -295,11 +322,17 @@ export default function DashboardPage() {
 					<TabsContent
 						value="analytics"
 						className="space-y-6">
-						<div className="grid gap-6 md:grid-cols-2">
-							<DemographicsCard />
-							<WatchTimeCard />
-						</div>
-						<TopVideosCard videos={recentPerformanceVideos} />
+						{isLoadingMovies ? (
+							<AnalyticsSkeleton />
+						) : (
+							<>
+								<div className="grid gap-6 md:grid-cols-2">
+									<DemographicsCard />
+									<WatchTimeCard />
+								</div>
+								<TopVideosCard videos={recentPerformanceVideos} />
+							</>
+						)}
 					</TabsContent>
 				</Tabs>
 			</main>
