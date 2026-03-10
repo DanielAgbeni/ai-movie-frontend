@@ -654,7 +654,7 @@ function UploadPage() {
 											name="description"
 											render={({ field }) => (
 												<FormItem>
-													<FormLabel>Description (Optional)</FormLabel>
+													<FormLabel>Description *</FormLabel>
 													<FormControl>
 														<Textarea
 															placeholder="Description..."
