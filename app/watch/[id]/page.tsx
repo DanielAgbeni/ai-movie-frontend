@@ -452,12 +452,12 @@ export default function WatchPage() {
 											)}
 										</div>
 
-										<Button
+										{/* <Button
 											variant="link"
 											className="mt-4 text-white hover:text-primary"
 											onClick={() => setIsPlayingTrailer(true)}>
 											Watch Trailer
-										</Button>
+										</Button> */}
 									</div>
 								</div>
 							)}
