@@ -59,7 +59,7 @@ import { toast } from 'sonner';
 const uploadSchema = z
 	.object({
 		title: z.string().min(1, 'Title is required'),
-		description: z.string().optional(),
+		description: z.string().min(1, 'Description is required'),
 		category: z.string().min(1, 'Category is required'),
 		visibility: z.enum(['public', 'unlisted', 'private']),
 		monetizationEnabled: z.boolean().default(false),

@@ -31,9 +31,9 @@ export default function NotFound() {
 						Go Home
 					</Link>
 					<Link
-						href="/explore"
+						href="/browse"
 						className="inline-flex h-11 items-center rounded-lg border border-border bg-card px-8 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent">
-						Explore Movies
+						Browse Movies
 					</Link>
 				</div>
 			</main>

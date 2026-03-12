@@ -73,7 +73,7 @@ function NotificationItemComponent({
 					}
 					break;
 				case 'purchase_alert':
-					router.push('/dashboard/sales'); // Updated to point to sales dashboard if available, or just dashboard
+					router.push('/dashboard'); // Updated to point to sales dashboard if available, or just dashboard
 					break;
 				default:
 					break;
