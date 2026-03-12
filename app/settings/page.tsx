@@ -415,6 +415,9 @@ export default function SettingsPage() {
 																{...field}
 															/>
 														</FormControl>
+														<FormDescription>
+															Must be at least 2 characters.
+														</FormDescription>
 														<FormMessage />
 													</FormItem>
 												)}
@@ -434,6 +437,8 @@ export default function SettingsPage() {
 														</FormControl>
 														<FormDescription>
 															This is your public handle: @{field.value}
+															<br />
+															Only letters, numbers, and underscores. Min 3 chars.
 														</FormDescription>
 														<FormMessage />
 													</FormItem>
