@@ -19,7 +19,7 @@
   --muted-foreground: oklch(0.75 0.02 195);
   --accent: oklch(0.55 0.15 185); /* Teal accent */
   --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: oklch(0.70 0.15 25); /* softer red for better contrast */
   --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(0.38 0.08 195); /* Teal border */
   --input: oklch(0.38 0.08 195);
@@ -55,7 +55,7 @@
   --muted-foreground: oklch(0.75 0.02 195);
   --accent: oklch(0.55 0.15 185);
   --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: oklch(0.70 0.15 25); /* softer red for better contrast */
   --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(0.38 0.08 195);
   --input: oklch(0.38 0.08 195);

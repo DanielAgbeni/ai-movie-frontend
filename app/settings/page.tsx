@@ -438,7 +438,7 @@ export default function SettingsPage() {
 														<FormDescription>
 															This is your public handle: @{field.value}
 															<br />
-															Only letters, numbers, and underscores. Min 3 chars.
+															Only small letters, numbers, and underscores. Min 3 chars.
 														</FormDescription>
 														<FormMessage />
 													</FormItem>
