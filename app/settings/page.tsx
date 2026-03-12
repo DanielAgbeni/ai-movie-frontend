@@ -91,6 +91,7 @@ export default function SettingsPage() {
 
 	const form = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileSchema),
+		mode: 'onChange',
 		defaultValues: {
 			displayName: '',
 			username: '',
