@@ -118,6 +118,18 @@ export const getAdminMovies = (
 	return api.get(url);
 };
 
+export const getAdminMovie = (
+	id: string,
+): ApiRequestResponseType<{
+	movie: Movie;
+	revenue: {
+		totalCents: number;
+		ordersCount: number;
+	};
+}> => {
+	return api.get(`/api/v1/admin/movies/${id}`);
+};
+
 export const takedownMovie = (
 	id: string,
 ): ApiRequestResponseType<{ movie: Movie }> => {

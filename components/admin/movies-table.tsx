@@ -33,6 +33,8 @@ import { takedownMovie, restoreMovie } from '@/api/admin';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 
+import { MovieDetailsDialog } from './movie-details-dialog';
+
 interface MoviesTableProps {
 	movies: Movie[];
 	pagination: PaginationType;
@@ -42,7 +44,7 @@ interface MoviesTableProps {
 export function MoviesTable({ movies, isLoading }: MoviesTableProps) {
 	const queryClient = useQueryClient();
 	const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
-	const [actionType, setActionType] = useState<'takedown' | 'restore' | null>(
+	const [actionType, setActionType] = useState<'takedown' | 'restore' | 'details' | null>(
 		null,
 	);
 
@@ -156,6 +158,13 @@ export function MoviesTable({ movies, isLoading }: MoviesTableProps) {
 										</DropdownMenuTrigger>
 										<DropdownMenuContent align="end">
 											<DropdownMenuLabel>Actions</DropdownMenuLabel>
+											<DropdownMenuItem
+												onClick={() => {
+													setSelectedMovie(movie);
+													setActionType('details');
+												}}>
+												<Eye className="mr-2 h-4 w-4" /> View Details
+											</DropdownMenuItem>
 											{movie.isDeleted ? (
 												<DropdownMenuItem
 													onClick={() => {
@@ -186,7 +195,7 @@ export function MoviesTable({ movies, isLoading }: MoviesTableProps) {
 			</div>
 
 			<Dialog
-				open={!!selectedMovie}
+				open={!!selectedMovie && actionType !== 'details'}
 				onOpenChange={(open) => !open && !isPending && setSelectedMovie(null)}>
 				<DialogContent>
 					<DialogHeader>
@@ -219,6 +228,16 @@ export function MoviesTable({ movies, isLoading }: MoviesTableProps) {
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
+
+			<MovieDetailsDialog
+				movieId={actionType === 'details' ? selectedMovie?._id || null : null}
+				onOpenChange={(open) => {
+					if (!open) {
+						setSelectedMovie(null);
+						setActionType(null);
+					}
+				}}
+			/>
 		</>
 	);
 }
